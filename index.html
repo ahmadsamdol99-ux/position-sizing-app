@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+
+    <input id="risk" type="number" placeholder="Risk (RM)"
+      class="w-full p-3 rounded-xl bg-gray-700" value="200">
+
+    <input id="entry" type="number" step="0.001" placeholder="Entry Price"
+      class="w-full p-3 rounded-xl bg-gray-700" value="0.355">
+
+    <input id="stop" type="number" step="0.001" placeholder="Stop Loss"
+      class="w-full p-3 rounded-xl bg-gray-700" value="0.315">
+
+    <input id="tp" type="number" step="0.001" placeholder="Take Profit"
+      class="w-full p-3 rounded-xl bg-gray-700" value="0.435">
+
+    <button onclick="calculate()"
+      class="w-full bg-green-500 hover:bg-green-600 transition p-3 rounded-xl font-bold">
+      Calculate
+    </button>
+
+  </div>
+
+  <div id="result" class="mt-6 bg-gray-700 p-4 rounded-2xl text-sm space-y-2"></div>
+
+</div>
+
+<script>
+function calculate() {
+
+  const modal = parseFloat(document.getElementById('modal').value);
+  const risk = parseFloat(document.getElementById('risk').value);
+  const entry = parseFloat(document.getElementById('entry').value);
+  const stop = parseFloat(document.getElementById('stop').value);
+  const tp = parseFloat(document.getElementById('tp').value);
+
+  const riskPerShare = entry - stop;
+
+  const sharesByRisk = Math.floor(risk / riskPerShare);
+  const sharesByModal = Math.floor(modal / entry);
+
+  const actualShares = Math.min(sharesByRisk, sharesByModal);
+
+  const lots = Math.floor(actualShares / 100);
+
+  const positionSize = actualShares * entry;
+
+  const remainingCash = modal - positionSize;
+
+  const fees = positionSize * 0.002;
+
+  const grossProfit = (tp - entry) * actualShares;
+
+  const netProfit = grossProfit - fees;
+
+  const rr = ((tp - entry) / riskPerShare).toFixed(2);
+
+  const valid = actualShares > 0 ? 'YES' : 'NO';
+
+  document.getElementById('result').innerHTML = `
+
+    <div class="flex justify-between"><span>Risk per Share</span><span>${riskPerShare.toFixed(3)}</span></div>
+
+    <div class="flex justify-between"><span>Shares by Risk</span><span>${sharesByRisk}</span></div>
+
+    <div class="flex justify-between"><span>Shares by Modal</span><span>${sharesByModal}</span></div>
+
+    <div class="flex justify-between"><span>Actual Shares</span><span>${actualShares}</span></div>
+
+    <div class="flex justify-between"><span>Lots</span><span>${lots}</span></div>
+
+    <div class="flex justify-between"><span>Position Size</span><span>RM ${positionSize.toFixed(2)}</span></div>
+
+    <div class="flex justify-between"><span>Remaining Cash</span><span>RM ${remainingCash.toFixed(2)}</span></div>
+
+    <div class="flex justify-between"><span>Fees</span><span>RM ${fees.toFixed(2)}</span></div>
+
+    <div class="flex justify-between"><span>Net Profit</span><span class="text-green-400">RM ${netProfit.toFixed(2)}</span></div>
+
+    <div class="flex justify-between"><span>R:R Ratio</span><span>${rr}</span></div>
+
+    <div class="flex justify-between font-bold text-green-400"><span>Trade Valid?</span><span>${valid}</span></div>
+  `;
+}
+
+calculate();
+</script>
+
+</body>
+</html>
